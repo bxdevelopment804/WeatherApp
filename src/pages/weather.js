@@ -33,7 +33,6 @@ import snow from '../images/snow.svg';
 import tstorm from '../images/tstorm.svg';
 
 const axios = require('axios');
-// const google = window.google;
 
 gsap.registerPlugin(Flip);
 
@@ -125,23 +124,27 @@ const Weather = () => {
 	// useEffect renders weather date for any locations in local storage on page load
 	useEffect(() => {
 		console.log('0.) USE EFFECT');
-		let lsLocationArray = JSON.parse(
-			window.localStorage.getItem('lsLocationArray')
-		);
-		if (lsLocationArray) {
-			//If previous locations are found in local storage, create a new 'process array' with those locations.  If no previous locations are found, use the LocationArray state location.
-			console.log('Local storage found.');
-			setLocationArray(lsLocationArray);
-			processArray = lsLocationArray;
-			let objectString = JSON.stringify(locationArray, null, 4);
-			console.log('LocationArray String Below:');
-			console.log(objectString);
-			let objectString2 = JSON.stringify(processArray, null, 4);
-			console.log('Process Array String Below:');
-			console.log(objectString2);
-		} else {
-			// No previous locations were found, so use the LocationArray default state location.
-			processArray = locationArray;
+		//ADDED 3/12/22
+		if (window !== 'undefined') {
+			let lsLocationArray = JSON.parse(
+				window.localStorage.getItem('lsLocationArray')
+			);
+
+			if (lsLocationArray) {
+				//If previous locations are found in local storage, create a new 'process array' with those locations.  If no previous locations are found, use the LocationArray state location.
+				console.log('Local storage found.');
+				setLocationArray(lsLocationArray);
+				processArray = lsLocationArray;
+				let objectString = JSON.stringify(locationArray, null, 4);
+				console.log('LocationArray String Below:');
+				console.log(objectString);
+				let objectString2 = JSON.stringify(processArray, null, 4);
+				console.log('Process Array String Below:');
+				console.log(objectString2);
+			} else {
+				// No previous locations were found, so use the LocationArray default state location.
+				processArray = locationArray;
+			}
 		}
 		processArray.forEach((location, i) => {
 			console.log('Process Array ' + i + ': ' + processArray[i]);
@@ -271,47 +274,48 @@ const Weather = () => {
 				weatherObject.location = cityAndState;
 				setFormattedLatLng(lat + ',' + lng);
 				setFoundLocation(cityAndState);
+				if (window !== 'undefined') {
+					if (!window.localStorage.getItem('lsLocationArray')) {
+						setAddressArray([]);
+						let tempLocationArray = [];
+						tempLocationArray.push(cityAndState);
+						console.log('Setting Location Array to ' + cityAndState);
+						let objectString = JSON.stringify(tempLocationArray, null, 4);
+						console.log('tempLocationArray String Below (NOT Local Storage):');
+						console.log(objectString);
+						setLocationArray(tempLocationArray);
 
-				if (!window.localStorage.getItem('lsLocationArray')) {
-					setAddressArray([]);
-					let tempLocationArray = [];
-					tempLocationArray.push(cityAndState);
-					console.log('Setting Location Array to ' + cityAndState);
-					let objectString = JSON.stringify(tempLocationArray, null, 4);
-					console.log('tempLocationArray String Below (NOT Local Storage):');
-					console.log(objectString);
-					setLocationArray(tempLocationArray);
+						console.log('No Local Storage Variables Found');
+						let initialLSLocationArray = [];
+						initialLSLocationArray.push(cityAndState);
+						console.log('Adding: ' + initialLSLocationArray);
+						window.localStorage.setItem(
+							'lsLocationArray',
+							JSON.stringify(initialLSLocationArray)
+						);
+					} else {
+						let tempLocationArray = locationArray;
+						tempLocationArray.push(cityAndState);
+						setLocationArray(tempLocationArray);
 
-					console.log('No Local Storage Variables Found');
-					let initialLSLocationArray = [];
-					initialLSLocationArray.push(cityAndState);
-					console.log('Adding: ' + initialLSLocationArray);
-					window.localStorage.setItem(
-						'lsLocationArray',
-						JSON.stringify(initialLSLocationArray)
-					);
-				} else {
-					let tempLocationArray = locationArray;
-					tempLocationArray.push(cityAndState);
-					setLocationArray(tempLocationArray);
-
-					console.log('Local Storage Variables Found.');
-					let tempLSLocationArray = JSON.parse(
-						window.localStorage.getItem('lsLocationArray')
-					);
-					console.log('Temp LS Location Array: ' + tempLSLocationArray);
-					let objectString = JSON.stringify(tempLSLocationArray, null, 4);
-					console.log('Initial tempLSLocationArray String Below:');
-					console.log(objectString);
-					tempLSLocationArray.push(cityAndState);
-					console.log('Saving Back to Local Storage:');
-					let objectString2 = JSON.stringify(tempLSLocationArray, null, 4);
-					// console.log('Initial tempLSLocationArray String Below:');
-					console.log(objectString2);
-					window.localStorage.setItem(
-						'lsLocationArray',
-						JSON.stringify(tempLSLocationArray)
-					);
+						console.log('Local Storage Variables Found.');
+						let tempLSLocationArray = JSON.parse(
+							window.localStorage.getItem('lsLocationArray')
+						);
+						console.log('Temp LS Location Array: ' + tempLSLocationArray);
+						let objectString = JSON.stringify(tempLSLocationArray, null, 4);
+						console.log('Initial tempLSLocationArray String Below:');
+						console.log(objectString);
+						tempLSLocationArray.push(cityAndState);
+						console.log('Saving Back to Local Storage:');
+						let objectString2 = JSON.stringify(tempLSLocationArray, null, 4);
+						// console.log('Initial tempLSLocationArray String Below:');
+						console.log(objectString2);
+						window.localStorage.setItem(
+							'lsLocationArray',
+							JSON.stringify(tempLSLocationArray)
+						);
+					}
 				}
 
 				//Adding below line because async state update isn't fast enough to immediately pass to getWeather()
@@ -722,35 +726,36 @@ const Weather = () => {
 					setLocalTime(localHour + ':' + currentMinutes + ' PM');
 					weatherObject.localTime = localHour + ':' + currentMinutes + ' PM';
 				}
+				if (window !== 'undefined') {
+					let currentLSLocationArray = JSON.parse(
+						window.localStorage.getItem('lsLocationArray')
+					);
+					console.log(
+						'currentLSLocationArray.length: ' + currentLSLocationArray.length
+					);
+					var updatedAddressArray2;
+					if (currentLSLocationArray.length == 1) {
+						updatedAddressArray2 = [];
+						weatherObject.key = 0;
+					} else {
+						updatedAddressArray2 = addressArray;
+					}
+					updatedAddressArray2.push(weatherObject);
+					console.log('Pushing to updatedAddressArray2 to Address Array!');
+					// setAddressArray(updatedAddressArray2);
+					setAddressArray([...updatedAddressArray2]);
 
-				let currentLSLocationArray = JSON.parse(
-					window.localStorage.getItem('lsLocationArray')
-				);
-				console.log(
-					'currentLSLocationArray.length: ' + currentLSLocationArray.length
-				);
-				var updatedAddressArray2;
-				if (currentLSLocationArray.length == 1) {
-					updatedAddressArray2 = [];
-					weatherObject.key = 0;
-				} else {
-					updatedAddressArray2 = addressArray;
-				}
-				updatedAddressArray2.push(weatherObject);
-				console.log('Pushing to updatedAddressArray2 to Address Array!');
-				// setAddressArray(updatedAddressArray2);
-				setAddressArray([...updatedAddressArray2]);
+					let objectString3 = JSON.stringify(updatedAddressArray2, null, 4);
+					console.log('updatedAddressArray2 String Below:');
+					console.log(objectString3);
 
-				let objectString3 = JSON.stringify(updatedAddressArray2, null, 4);
-				console.log('updatedAddressArray2 String Below:');
-				console.log(objectString3);
-
-				let objectString4 = JSON.stringify(weatherObject, null, 4);
-				console.log('weatherObject String Below:');
-				console.log(objectString4);
-				// ---------------------
-				if (!window.localStorage.getItem('lsLocationArray')) {
-					console.log('No Local Storage Variables Found');
+					let objectString4 = JSON.stringify(weatherObject, null, 4);
+					console.log('weatherObject String Below:');
+					console.log(objectString4);
+					// ---------------------
+					if (!window.localStorage.getItem('lsLocationArray')) {
+						console.log('No Local Storage Variables Found');
+					}
 				}
 			}
 		} catch (error) {
@@ -786,47 +791,48 @@ const Weather = () => {
 				weatherObject.location = cityAndState;
 				setFormattedLatLng(lat + ',' + lng);
 				setFoundLocation(cityAndState);
+				if (window !== 'undefined') {
+					if (!window.localStorage.getItem('lsLocationArray')) {
+						setAddressArray([]);
+						let tempLocationArray = [];
+						tempLocationArray.push(cityAndState);
+						console.log('Setting Location Array to ' + cityAndState);
+						let objectString = JSON.stringify(tempLocationArray, null, 4);
+						console.log('tempLocationArray String Below (NOT Local Storage):');
+						console.log(objectString);
+						setLocationArray(tempLocationArray);
 
-				if (!window.localStorage.getItem('lsLocationArray')) {
-					setAddressArray([]);
-					let tempLocationArray = [];
-					tempLocationArray.push(cityAndState);
-					console.log('Setting Location Array to ' + cityAndState);
-					let objectString = JSON.stringify(tempLocationArray, null, 4);
-					console.log('tempLocationArray String Below (NOT Local Storage):');
-					console.log(objectString);
-					setLocationArray(tempLocationArray);
+						console.log('No Local Storage Variables Found');
+						let initialLSLocationArray = [];
+						initialLSLocationArray.push(cityAndState);
+						console.log('Adding: ' + initialLSLocationArray);
+						window.localStorage.setItem(
+							'lsLocationArray',
+							JSON.stringify(initialLSLocationArray)
+						);
+					} else {
+						let tempLocationArray = locationArray;
+						tempLocationArray.push(cityAndState);
+						setLocationArray(tempLocationArray);
 
-					console.log('No Local Storage Variables Found');
-					let initialLSLocationArray = [];
-					initialLSLocationArray.push(cityAndState);
-					console.log('Adding: ' + initialLSLocationArray);
-					window.localStorage.setItem(
-						'lsLocationArray',
-						JSON.stringify(initialLSLocationArray)
-					);
-				} else {
-					let tempLocationArray = locationArray;
-					tempLocationArray.push(cityAndState);
-					setLocationArray(tempLocationArray);
-
-					console.log('Local Storage Variables Found.');
-					let tempLSLocationArray = JSON.parse(
-						window.localStorage.getItem('lsLocationArray')
-					);
-					console.log('Temp LS Location Array: ' + tempLSLocationArray);
-					let objectString = JSON.stringify(tempLSLocationArray, null, 4);
-					console.log('Initial tempLSLocationArray String Below:');
-					console.log(objectString);
-					tempLSLocationArray.push(cityAndState);
-					console.log('Saving Back to Local Storage:');
-					let objectString2 = JSON.stringify(tempLSLocationArray, null, 4);
-					// console.log('Initial tempLSLocationArray String Below:');
-					console.log(objectString2);
-					window.localStorage.setItem(
-						'lsLocationArray',
-						JSON.stringify(tempLSLocationArray)
-					);
+						console.log('Local Storage Variables Found.');
+						let tempLSLocationArray = JSON.parse(
+							window.localStorage.getItem('lsLocationArray')
+						);
+						console.log('Temp LS Location Array: ' + tempLSLocationArray);
+						let objectString = JSON.stringify(tempLSLocationArray, null, 4);
+						console.log('Initial tempLSLocationArray String Below:');
+						console.log(objectString);
+						tempLSLocationArray.push(cityAndState);
+						console.log('Saving Back to Local Storage:');
+						let objectString2 = JSON.stringify(tempLSLocationArray, null, 4);
+						// console.log('Initial tempLSLocationArray String Below:');
+						console.log(objectString2);
+						window.localStorage.setItem(
+							'lsLocationArray',
+							JSON.stringify(tempLSLocationArray)
+						);
+					}
 				}
 
 				//Adding below line because async state update isn't fast enough to immediately pass to getWeather()
