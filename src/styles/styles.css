@@ -1,0 +1,139 @@
+#pageContainer {
+  box-sizing: border-box;
+  background-size: cover;
+  background-position: center;
+  margin: -8px;
+  padding: 20px;
+  min-height: 100vh;
+}
+#pageContainer #pageTitle {
+  background-color: rgba(240, 248, 255, 0.6);
+  width: fit-content;
+  margin: auto;
+  border-radius: 5px;
+  box-sizing: border-box;
+  padding: 4px;
+}
+#pageContainer #weatherSlides {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+#pageContainer #weatherSlides #addCityButtonContainer {
+  border-radius: 10px;
+  box-sizing: border-box;
+  padding: 15px 20px;
+  margin: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+#pageContainer #weatherSlides #addCityButton {
+  border-radius: 100%;
+  border: dashed black 2px;
+  width: 200px;
+  min-width: 200px;
+  height: 200px;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-size: larger;
+  background-color: rgba(240, 248, 255, 0.8);
+}
+#pageContainer #weatherSlides #addCityButton .buttonText {
+  margin: 5px;
+}
+#pageContainer .bottomText {
+  background-color: rgba(240, 248, 255, 0.6);
+  font-style: italic;
+  width: fit-content;
+  border-radius: 5px;
+  padding: 4px;
+  margin: 2px auto;
+}
+#pageContainer .bottomText #tomorrowCredit {
+  width: 200px;
+  border: solid red;
+}
+
+#addCityModal #addModalHeader {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  color: black;
+}
+#addCityModal #modalInput {
+  width: 100%;
+  margin: auto;
+}
+#addCityModal #addModalButtonContainer {
+  display: flex;
+  position: relative;
+  width: 200px;
+  margin: 20px auto 0px;
+  align-items: center;
+  justify-content: space-between;
+}
+#addCityModal #addModalButtonContainer .addModalButton {
+  display: flex;
+  font-size: larger;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
+#weatherContainer {
+  border: solid black;
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin: 20px;
+  position: relative;
+  width: 200px;
+  min-width: 200px;
+  height: 390px;
+  background-color: rgba(240, 248, 255, 0.6);
+}
+#weatherContainer .weatherLineItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+}
+#weatherContainer #locationTitle {
+  font-size: larger;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+#weatherContainer #deleteButton {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  border: solid black;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-weight: 700;
+  margin: 0px 0px 0px 90%;
+}
+#weatherContainer #deleteButton:hover {
+  transform: translateY(2px);
+  color: red;
+  background-color: rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+}
+
+#deleteCityModal #deleteModalHeader {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  color: black;
+}
+#deleteCityModal #deleteModalButtonContainer {
+  display: flex;
+  position: relative;
+  width: 100%;
+  margin: 20px auto 0px;
+  align-items: center;
+  justify-content: space-between;
+}
+#deleteCityModal #deleteModalButtonContainer .deleteModalButton {
+  display: flex;
+  font-size: larger;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+
+/*# sourceMappingURL=styles.css.map */

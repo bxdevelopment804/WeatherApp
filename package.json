@@ -22,8 +22,10 @@
     "gatsby-plugin-sitemap": "^5.7.0",
     "gatsby-source-filesystem": "^4.7.0",
     "gatsby-transformer-sharp": "^4.7.0",
+    "gsap": "^3.9.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-modal": "^3.14.4",
     "sass": "^1.49.7"
   }
 }
