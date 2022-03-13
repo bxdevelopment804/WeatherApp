@@ -33,7 +33,7 @@ import snow from '../images/snow.svg';
 import tstorm from '../images/tstorm.svg';
 
 const axios = require('axios');
-const google = window.google;
+// const google = window.google;
 
 gsap.registerPlugin(Flip);
 
