@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import { gsap } from 'gsap';
-import { Flip } from 'gsap/all';
+// import { gsap } from 'gsap';
+// import { Flip } from 'gsap/all';
 
 import GetWeather from '../shared/getWeather';
 
@@ -34,7 +34,7 @@ import tstorm from '../images/tstorm.svg';
 
 const axios = require('axios');
 
-gsap.registerPlugin(Flip);
+// gsap.registerPlugin(Flip);
 
 const Weather = () => {
 	//Overall, Weather function looks in local storage for any user defined locations, which are stored in an array.  A default location will be used if this is the user's first time.  This location array is converted into an array of weather objects for each city, and then passed to the GetWeather component for rendering.  New locations the user adds will be added to local storage.
@@ -51,7 +51,7 @@ const Weather = () => {
 	const [addCityModalIsOpen, setAddCityModalIsOpen] = useState(false);
 	const [randomBackground, setRandomBackground] = useState();
 
-	const state = Flip.getState('.getWeatherContainer');
+	// const state = Flip.getState('.getWeatherContainer');
 
 	const backgroundsArray = [
 		'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2670&q=80',
