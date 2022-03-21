@@ -42,7 +42,7 @@ import snow from '../images/snow.svg';
 import tstorm from '../images/tstorm.svg';
 // import { getLowResolutionImageURL } from 'gatsby-plugin-image';
 
-const google = window.google;
+// const google = window.google;
 const axios = require('axios');
 
 // gsap.registerPlugin(Flip);
