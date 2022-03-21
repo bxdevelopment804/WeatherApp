@@ -30,25 +30,47 @@ const GetWeather = (props) => {
 	}
 
 	function closeDeleteCityModal() {
+		console.log('DELETE CITY MODAL - GET WEATHER.JS');
 		console.log('props.index: ' + props.index);
 
 		let lsLocationArray = JSON.parse(
 			window.localStorage.getItem('lsLocationArray')
 		);
-		let objectString = JSON.stringify(lsLocationArray, null, 4);
-		console.log('lsLocationArray String Below:');
-		console.log(objectString);
+		if (lsLocationArray) {
+			console.log('lsLocationArray length: ' + lsLocationArray.length);
+			let objectString = JSON.stringify(lsLocationArray, null, 4);
+			console.log('lsLocationArray String Below:');
+			console.log(objectString);
 
-		let tempLocationArray = lsLocationArray;
-		tempLocationArray.splice(props.index, 1);
-		let objectString2 = JSON.stringify(tempLocationArray, null, 4);
-		console.log('tempLocation Array String Below:');
-		console.log(objectString2);
-
-		window.localStorage.setItem(
-			'lsLocationArray',
-			JSON.stringify(tempLocationArray)
-		);
+			let tempLocationArray = lsLocationArray;
+			tempLocationArray.splice(props.index, 1);
+			// let objectString2 = JSON.stringify(tempLocationArray, null, 4);
+			// console.log('tempLocation Array String Below:');
+			// console.log(objectString2);
+			if (lsLocationArray.length == 0) {
+				// window.localStorage.clear();
+				tempLocationArray = ['empty'];
+				console.log('Trying to set array to "empty"...');
+				window.localStorage.setItem(
+					'lsLocationArray',
+					JSON.stringify(tempLocationArray)
+				);
+				let objectString2 = JSON.stringify(tempLocationArray, null, 4);
+				console.log('tempLocation Array String Below:');
+				console.log(objectString2);
+				// document.getElementById('weatherContainer').style.display = 'none';
+			} else {
+				window.localStorage.setItem(
+					'lsLocationArray',
+					JSON.stringify(tempLocationArray)
+				);
+			}
+			// setDeleted(true);
+		}
+		// else {
+		// 	document.getElementById('weatherContainer').style.display = 'none';
+		// 	// document.getElementById('deleteModalButton').style.display = 'none';
+		// }
 		setDeleted(true);
 		setDeleteCityModalIsOpen(false);
 	}

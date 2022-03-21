@@ -1,12 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { locationsContext } from '../shared/LocationsProvider';
 import Modal from 'react-modal';
+// import PlacesAutocomplete, {
+// 	geocodeByAddress,
+// 	geocodeByPlaceId,
+// 	getLatLng,
+// } from 'react-places-autocomplete';
 // import { gsap } from 'gsap';
 // import { Flip } from 'gsap/all';
 
 import GetWeather from '../shared/getWeather';
+// import { googleAutocomplete } from '../shared/googleAutocomplete';
+// import { usePlacesAutocomplete } from '../shared/usePlacesAutocomplete';
+import SearchLocationInput from '../shared/searchLocationInput';
 
 import clear_day from '../images/clear_day.svg';
-import clear_night from '../images/clear_night.svg';
+// import clear_night from '../images/clear_night.svg';
 import cloudy from '../images/cloudy.svg';
 import drizzle from '../images/drizzle.svg';
 import flurries from '../images/flurries.svg';
@@ -20,10 +29,10 @@ import ice_pellets_heavy from '../images/ice_pellets_heavy.svg';
 import ice_pellets_light from '../images/ice_pellets_light.svg';
 import ice_pellets from '../images/ice_pellets.svg';
 import mostly_clear_day from '../images/mostly_clear_day.svg';
-import mostly_clear_night from '../images/mostly_clear_night.svg';
+// import mostly_clear_night from '../images/mostly_clear_night.svg';
 import mostly_cloudy from '../images/mostly_cloudy.svg';
 import partly_cloudy_day from '../images/partly_cloudy_day.svg';
-import partly_cloudy_night from '../images/partly_cloudy_night.svg';
+// import partly_cloudy_night from '../images/partly_cloudy_night.svg';
 import rain_heavy from '../images/rain_heavy.svg';
 import rain_light from '../images/rain_light.svg';
 import rain from '../images/rain.svg';
@@ -31,7 +40,9 @@ import snow_heavy from '../images/snow_heavy.svg';
 import snow_light from '../images/snow_light.svg';
 import snow from '../images/snow.svg';
 import tstorm from '../images/tstorm.svg';
+// import { getLowResolutionImageURL } from 'gatsby-plugin-image';
 
+const google = window.google;
 const axios = require('axios');
 
 // gsap.registerPlugin(Flip);
@@ -51,7 +62,88 @@ const Weather = () => {
 	const [addCityModalIsOpen, setAddCityModalIsOpen] = useState(false);
 	const [randomBackground, setRandomBackground] = useState();
 
-	// const state = Flip.getState('.getWeatherContainer');
+	const suggestedLocation = useContext(locationsContext);
+
+	// const [googleAddress, setGoogleAddress] = useState('');
+	// const [coordinates, setCoordinates] = useState({
+	// 	lat: null,
+	// 	lng: null,
+	// });
+
+	// const handleSelect = async (value) => {
+	// 	const results = await geocodeByAddress(value);
+
+	// 	const ll = await getLatLng(results[0]);
+	// 	console.log('LL: ' + ll);
+	// 	setGoogleAddress(value);
+	// 	setCoordinates(ll);
+	// };
+
+	// const [selectedPrediction, setSelectedPrediction] = useState(null);
+	// const [searchValue, setSearchValue] = useState('');
+	// const predictions = usePlacesAutocomplete(searchValue);
+
+	// const handlePredictionSelection = (e, prediction) => {
+	// 	e.preventDefault();
+	// 	setSelectedPrediction(prediction);
+	// };
+
+	//Search Location Variables and State - 3-16-22
+	// let autoComplete;
+
+	// const loadScript = (url, callback) => {
+	// 	let script = document.createElement('script');
+	// 	script.type = 'text/javascript';
+
+	// 	if (script.readyState) {
+	// 		script.onreadystatechange = function () {
+	// 			if (
+	// 				script.readyState === 'loaded' ||
+	// 				script.readyState === 'complete'
+	// 			) {
+	// 				script.onreadystatechange = null;
+	// 				callback();
+	// 			}
+	// 		};
+	// 	} else {
+	// 		script.onload = () => callback();
+	// 	}
+
+	// 	script.src = url;
+	// 	document.getElementsByTagName('head')[0].appendChild(script);
+	// };
+
+	// function handleScriptLoad(updateQuery, autoCompleteRef) {
+	// 	autoComplete = new window.google.maps.places.Autocomplete(
+	// 		autoCompleteRef.current,
+	// 		{ types: ['(cities)'], componentRestrictions: { country: 'us' } }
+	// 	);
+	// 	autoComplete.setFields(['address_components', 'formatted_address']);
+	// 	autoComplete.addListener('place_changed', () =>
+	// 		handlePlaceSelect(updateQuery)
+	// 	);
+	// }
+
+	// async function handlePlaceSelect(updateQuery) {
+	// 	const addressObject = autoComplete.getPlace();
+	// 	const query = addressObject.formatted_address;
+	// 	updateQuery(query);
+	// 	// ---------------------------
+	// 	setEnteredAddress(query);
+	// 	// ---------------------------
+	// 	console.log(addressObject);
+	// }
+
+	// const [query, setQuery] = useState('');
+	// const autoCompleteRef = useRef(null);
+
+	// useEffect(() => {
+	// 	loadScript(
+	// 		`https://maps.googleapis.com/maps/api/js?key=AIzaSyCdLuhh7iqVVQOoB0gtTPxIOFDAY6jqP0Q&libraries=places`,
+	// 		() => handleScriptLoad(setQuery, autoCompleteRef)
+	// 	);
+	// }, []);
+	//---------------------------
 
 	const backgroundsArray = [
 		'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2670&q=80',
@@ -88,11 +180,19 @@ const Weather = () => {
 
 	function afterOpenAddCityModal() {
 		// UNUSED
+		setEnteredAddress(suggestedLocation[0]);
 	}
 
 	function closeAddCityModal() {
-		if (enteredAddress) {
-			convertAddressToLatLng();
+		// if (enteredAddress) {
+		// if (query) {
+		if (suggestedLocation[0] !== '') {
+			console.log(
+				'CloseAddCityModal() suggestedLocation[0] ' + suggestedLocation[0]
+			);
+			setEnteredAddress(suggestedLocation[0]);
+			let passedLocation = suggestedLocation[0];
+			convertAddressToLatLng(passedLocation);
 			// convertAllAddressesToLatLng(
 			// 	enteredAddress,
 			// 	Number(locationArray.length),
@@ -107,6 +207,7 @@ const Weather = () => {
 			setEnteredAddress('');
 		}
 		setAddCityModalIsOpen(false);
+		suggestedLocation[1]('');
 	}
 
 	var initialWeatherObject = [];
@@ -130,7 +231,8 @@ const Weather = () => {
 				window.localStorage.getItem('lsLocationArray')
 			);
 
-			if (lsLocationArray) {
+			if (lsLocationArray && lsLocationArray[0] != 'empty') {
+				// if (lsLocationArray && lsLocationArray !== ['empty']) {
 				//If previous locations are found in local storage, create a new 'process array' with those locations.  If no previous locations are found, use the LocationArray state location.
 				console.log('Local storage found.');
 				setLocationArray(lsLocationArray);
@@ -142,8 +244,12 @@ const Weather = () => {
 				console.log('Process Array String Below:');
 				console.log(objectString2);
 			} else {
-				// No previous locations were found, so use the LocationArray default state location.
+				//No previous locations were found, so use the LocationArray default state location.
 				processArray = locationArray;
+				let objectString3 = JSON.stringify(processArray, null, 4);
+				console.log('Process Array String Below:');
+				console.log(objectString3);
+				window.localStorage.clear();
 			}
 		}
 		processArray.forEach((location, i) => {
@@ -352,32 +458,41 @@ const Weather = () => {
 			var weatherImage;
 			// Getting UTC time zone from API response, then adding five hours to adjust that to Eastern Standard Time.
 			var estHour =
-				Number(response.data.data.timelines[0].startTime.substring(11, 13)) + 5;
-			var currentMinutes = response.data.data.timelines[0].startTime.substring(
+				// Number(response.data.data.timelines[0].startTime.substring(11, 13)) + 5;
+				Number(response.data.data.timelines[2].startTime.substring(11, 13)) + 5;
+			// var currentMinutes = response.data.data.timelines[0].startTime.substring(
+			var currentMinutes = response.data.data.timelines[2].startTime.substring(
 				14,
 				16
 			);
 
 			var currentTemperature = Math.round(
-				response.data.data.timelines[0].intervals[0].values.temperature
+				// response.data.data.timelines[0].intervals[0].values.temperature
+				response.data.data.timelines[2].intervals[0].values.temperature
 			);
 			var currentWeatherCode =
-				response.data.data.timelines[0].intervals[0].values.weatherCode;
+				// response.data.data.timelines[0].intervals[0].values.weatherCode;
+				response.data.data.timelines[2].intervals[0].values.weatherCode;
 			var currentHumidity = Math.round(
-				response.data.data.timelines[0].intervals[0].values.humidity
+				// response.data.data.timelines[0].intervals[0].values.humidity
+				response.data.data.timelines[2].intervals[0].values.humidity
 			);
 			var currentPrecipitationProbability = Math.round(
-				response.data.data.timelines[0].intervals[0].values
+				// response.data.data.timelines[0].intervals[0].values
+				response.data.data.timelines[2].intervals[0].values
 					.precipitationProbability
 			);
 			var currentWindSpeed = Math.round(
-				response.data.data.timelines[0].intervals[0].values.windSpeed
+				// response.data.data.timelines[0].intervals[0].values.windSpeed
+				response.data.data.timelines[2].intervals[0].values.windSpeed
 			);
 			var highTemp = Math.round(
-				response.data.data.timelines[2].intervals[0].values.temperatureMax
+				// response.data.data.timelines[2].intervals[0].values.temperatureMax
+				response.data.data.timelines[1].intervals[0].values.temperatureMax
 			);
 			var lowTemp = Math.round(
-				response.data.data.timelines[2].intervals[0].values.temperatureMin
+				// response.data.data.timelines[2].intervals[0].values.temperatureMin
+				response.data.data.timelines[1].intervals[0].values.temperatureMin
 			);
 
 			switch (currentWeatherCode) {
@@ -768,12 +883,14 @@ const Weather = () => {
 	// -----------------------
 
 	// Converts a zip code or city & state into a latitude & longitude.
-	async function convertAddressToLatLng() {
+	// async function convertAddressToLatLng() {
+	async function convertAddressToLatLng(passedLocation) {
 		console.log('4.) CONVERT ADDED ADDRESS TO LAT & LNG');
 		var lat = '';
 		var lng = '';
 		var cityAndState = '';
-		var formattedAddress = enteredAddress.trim().replace(' ', ',+');
+		// var formattedAddress = enteredAddress.trim().replace(' ', ',+');
+		var formattedAddress = passedLocation.trim().replace(' ', ',+');
 
 		try {
 			const response = await axios.get(
@@ -787,16 +904,31 @@ const Weather = () => {
 				lng = response.data.results[0].geometry.location.lng;
 				cityAndState = response.data.results[0].formatted_address;
 
+				//3/21/22 Clean Up-------------------------
+				let cityAndStateArray = cityAndState.split(',');
+				let modifiedCityAndState = cityAndStateArray[0].concat(
+					', ',
+					cityAndStateArray[1].replace(/\d+/, ' ').trim()
+				);
+				// let test1 = cityAndStateArray[1].replace(/\d+/, ' ').trim();
+
 				//--------------------
-				weatherObject.location = cityAndState;
+				// weatherObject.location = cityAndState;
+				weatherObject.location = modifiedCityAndState;
+				//--------------------------------------
+
 				setFormattedLatLng(lat + ',' + lng);
-				setFoundLocation(cityAndState);
+				// setFoundLocation(cityAndState);
+				setFoundLocation(modifiedCityAndState);
+				console.log('Modified City and State: ' + modifiedCityAndState);
 				if (window !== 'undefined') {
 					if (!window.localStorage.getItem('lsLocationArray')) {
 						setAddressArray([]);
 						let tempLocationArray = [];
-						tempLocationArray.push(cityAndState);
-						console.log('Setting Location Array to ' + cityAndState);
+						// tempLocationArray.push(cityAndState);
+						tempLocationArray.push(modifiedCityAndState);
+						// console.log('Setting Location Array to ' + cityAndState);
+						console.log('Setting Location Array to ' + modifiedCityAndState);
 						let objectString = JSON.stringify(tempLocationArray, null, 4);
 						console.log('tempLocationArray String Below (NOT Local Storage):');
 						console.log(objectString);
@@ -804,7 +936,8 @@ const Weather = () => {
 
 						console.log('No Local Storage Variables Found');
 						let initialLSLocationArray = [];
-						initialLSLocationArray.push(cityAndState);
+						// initialLSLocationArray.push(cityAndState);
+						initialLSLocationArray.push(modifiedCityAndState);
 						console.log('Adding: ' + initialLSLocationArray);
 						window.localStorage.setItem(
 							'lsLocationArray',
@@ -812,7 +945,8 @@ const Weather = () => {
 						);
 					} else {
 						let tempLocationArray = locationArray;
-						tempLocationArray.push(cityAndState);
+						// tempLocationArray.push(cityAndState);
+						tempLocationArray.push(modifiedCityAndState);
 						setLocationArray(tempLocationArray);
 
 						console.log('Local Storage Variables Found.');
@@ -823,7 +957,8 @@ const Weather = () => {
 						let objectString = JSON.stringify(tempLSLocationArray, null, 4);
 						console.log('Initial tempLSLocationArray String Below:');
 						console.log(objectString);
-						tempLSLocationArray.push(cityAndState);
+						// tempLSLocationArray.push(cityAndState);
+						tempLSLocationArray.push(modifiedCityAndState);
 						console.log('Saving Back to Local Storage:');
 						let objectString2 = JSON.stringify(tempLSLocationArray, null, 4);
 						// console.log('Initial tempLSLocationArray String Below:');
@@ -892,6 +1027,58 @@ const Weather = () => {
 						<div className='buttonText'>CITY</div>
 					</button>
 				</div>
+				{/* <input id='autocomplete' placeholder='Enter a place' type='text' />
+
+				<p>lat: {coordinates.lat}</p>
+				<p>lng: {coordinates.lng}</p>
+				<p>Google Address: {googleAddress}</p> */}
+
+				{/* <PlacesAutocomplete
+					// value={this.state.address}
+					value={googleAddress}
+					// onChange={this.handleChange}
+					onChange={setGoogleAddress}
+					// onChange={(event) => setGoogleAddress(event.target.value)}
+					onSelect={handleSelect}
+				>
+					{({
+						getInputProps,
+						suggestions,
+						getSuggestionItemProps,
+						loading,
+					}) => (
+						<div>
+							<input
+								{...getInputProps({
+									placeholder: 'Search Places ...',
+									className: 'location-search-input',
+								})}
+							/>
+							<div className='autocomplete-dropdown-container'>
+								{loading && <div>Loading...</div>}
+								{suggestions.map((suggestion) => {
+									const className = suggestion.active
+										? 'suggestion-item--active'
+										: 'suggestion-item';
+									// inline style for demonstration purpose
+									const style = suggestion.active
+										? { backgroundColor: '#fafafa', cursor: 'pointer' }
+										: { backgroundColor: '#ffffff', cursor: 'pointer' };
+									return (
+										<div
+											{...getSuggestionItemProps(suggestion, {
+												className,
+												style,
+											})}
+										>
+											<span>{suggestion.description}</span>
+										</div>
+									);
+								})}
+							</div>
+						</div>
+					)}
+				</PlacesAutocomplete> */}
 				<Modal
 					id='addCityModal'
 					isOpen={addCityModalIsOpen}
@@ -904,11 +1091,26 @@ const Weather = () => {
 						Which location would you like to add?
 					</h2>
 
-					<input
+					{/* <input
 						id='modalInput'
 						type='text'
 						onChange={(event) => setEnteredAddress(event.target.value)}
-					/>
+					/> */}
+
+					{/* <SearchLocationInput /> */}
+					<SearchLocationInput setEnteredAddress={setEnteredAddress} />
+
+					{/* <div className='search-location-input'>
+						<input
+							ref={autoCompleteRef}
+							onChange={(event) => setQuery(event.target.value)}
+							placeholder='Enter a City'
+							value={query}
+						/>
+					</div> */}
+
+					{/* <p>Entered Address: {enteredAddress}</p>
+					<p>Query: {query}</p> */}
 					<div id='addModalButtonContainer'>
 						<button
 							className='addModalButton'
@@ -928,16 +1130,59 @@ const Weather = () => {
 				</Modal>
 			</div>
 
+			{/* THE BELOW SECTION PARTIALLY WORKS, BUT DOES PRODUCES CITIES AND NOT STATES */}
+			{/* <>
+				<form>
+					<input
+						name='predictionSearch'
+						value={searchValue}
+						onChange={(e) => setSearchValue(e.target.value)}
+					/>
+					<img
+						src='https://developers.google.com/maps/documentation/images/powered_by_google_on_white.png'
+						alt='Powered by Google'
+					/>
+					<ul>
+						{predictions?.map((prediction) => (
+							<li key={prediction?.place_id}>
+								<button
+									onClick={(e) => handlePredictionSelection(e, prediction)}
+									onKeyDown={(e) => handlePredictionSelection(e, prediction)}
+								>
+									{prediction?.structured_formatting?.main_text || 'Not found'}
+								</button>
+							</li>
+						))}
+					</ul>
+					<h3>You searched for: {searchValue}</h3>
+					<h3>
+						You selected:{' '}
+						{selectedPrediction?.structured_formatting?.main_text || 'None'}
+					</h3>
+				</form>
+			</> */}
+
 			<div className='bottomText' id='tomorrowCredit'>
 				Weather Data Provided By Tomorrow.io
 			</div>
 			<div className='bottomText' id='bxdCredit'>
 				Page Created By BX Development
 			</div>
-			<script
-				async
-				src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCdLuhh7iqVVQOoB0gtTPxIOFDAY6jqP0Q&libraries=places&callback=initMap'
-			></script>
+			{/* <SearchLocationInput /> */}
+			{/* THE BELOW WORKS, BUT TEMPORARILY HIDING IT TRYING TO GET IT TO WORK IN THE MODAL */}
+			{/* <p>IN PAGE GOOGLE AUTOCOMPLETE BELOW:</p>
+			<div className='search-location-input'>
+				<input
+					ref={autoCompleteRef}
+					onChange={(event) => setQuery(event.target.value)}
+					placeholder='Enter a City'
+					value={query}
+				/>
+			</div>
+			<p>Entered Address: {enteredAddress}</p>
+			<p>Query: {query}</p> */}
+			{/* <p>Entered Address: {enteredAddress}</p>
+			<p>Suggested Location: {suggestedLocation[0]}</p> */}
 		</section>
 	);
 };

@@ -95,6 +95,7 @@ $height: 390px;
 		font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS',
 			sans-serif;
 		color: black;
+		text-align: center;
 	}
 
 	#modalInput {
@@ -188,3 +189,18 @@ $height: 390px;
 		}
 	}
 }
+
+.pac-target-input {
+	// border: solid red;
+	width: 100%;
+}
+
+// .pac-container {
+// 	// z-index: 1051 !important;
+// 	z-index: 99999999999 !important;
+// }
+
+// .pac-item {
+// 	// z-index: 1051 !important;
+// 	z-index: 99999999999 !important;
+// }
