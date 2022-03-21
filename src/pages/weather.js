@@ -463,8 +463,30 @@ const Weather = () => {
 			var currentConditions;
 			var weatherImage;
 			// Getting UTC time zone from API response, then adding five hours to adjust that to Eastern Standard Time.
+
+			var currentMinutes = new Date().getMinutes().toLocaleString('en-US', {
+				minimumIntegerDigits: 2,
+				useGrouping: false,
+			});
+			console.log('Current Minutes: ' + currentMinutes);
+
+			console.log('Data Array Length: ' + response.data.data.timelines.length);
+			var currentIndex;
+			var dayIndex;
+			for (let i = 0; i < response.data.data.timelines.length; ++i) {
+				if (response.data.data.timelines[i].timestep == 'current') {
+					currentIndex = i;
+				} else if (response.data.data.timelines[i].timestep == '1d') {
+					dayIndex = i;
+				}
+			}
+			console.log('currentIndex: ' + currentIndex + ' dayIndex: ' + dayIndex);
+
 			var estHour =
-				Number(response.data.data.timelines[1].startTime.substring(11, 13)) + 5;
+				// Number(response.data.data.timelines[1].startTime.substring(11, 13)) + 5;
+				Number(
+					response.data.data.timelines[currentIndex].startTime.substring(11, 13)
+				) + 5;
 			// Number(response.data.data.timelines[2].startTime.substring(11, 13)) + 5;
 			// var currentMinutes = response.data.data.timelines[0].startTime.substring(
 			// var currentMinutes = response.data.data.timelines[2].startTime.substring(
@@ -472,41 +494,46 @@ const Weather = () => {
 			// 	16
 			// );
 			console.log('EST Hour: ' + estHour);
-			var currentMinutes = new Date().getMinutes().toLocaleString('en-US', {
-				minimumIntegerDigits: 2,
-				useGrouping: false,
-			});
-			console.log('Current Minutes: ' + currentMinutes);
 
 			var currentTemperature = Math.round(
-				response.data.data.timelines[1].intervals[0].values.temperature
+				// response.data.data.timelines[1].intervals[0].values.temperature
+				response.data.data.timelines[currentIndex].intervals[0].values
+					.temperature
 				// response.data.data.timelines[2].intervals[0].values.temperature
 			);
 			var currentWeatherCode =
-				response.data.data.timelines[1].intervals[0].values.weatherCode;
+				// response.data.data.timelines[1].intervals[0].values.weatherCode;
+				response.data.data.timelines[currentIndex].intervals[0].values
+					.weatherCode;
 			// response.data.data.timelines[2].intervals[0].values.weatherCode;
 			var currentHumidity = Math.round(
-				response.data.data.timelines[1].intervals[0].values.humidity
+				// response.data.data.timelines[1].intervals[0].values.humidity
+				response.data.data.timelines[currentIndex].intervals[0].values.humidity
 				// response.data.data.timelines[2].intervals[0].values.humidity
 			);
 			var currentPrecipitationProbability = Math.round(
 				// response.data.data.timelines[2].intervals[0].values
-				response.data.data.timelines[1].intervals[0].values
+				// response.data.data.timelines[1].intervals[0].values
+				response.data.data.timelines[currentIndex].intervals[0].values
 					.precipitationProbability
 			);
 			var currentWindSpeed = Math.round(
-				response.data.data.timelines[1].intervals[0].values.windSpeed
+				// response.data.data.timelines[1].intervals[0].values.windSpeed
+				response.data.data.timelines[currentIndex].intervals[0].values.windSpeed
 				// response.data.data.timelines[2].intervals[0].values.windSpeed
 			);
 			var highTemp = Math.round(
 				// response.data.data.timelines[2].intervals[0].values.temperatureMax
 				// response.data.data.timelines[1].intervals[0].values.temperatureMax
-				response.data.data.timelines[0].intervals[0].values.temperatureMax
+				// response.data.data.timelines[0].intervals[0].values.temperatureMax
+				response.data.data.timelines[dayIndex].intervals[0].values
+					.temperatureMax
 			);
 			var lowTemp = Math.round(
 				// response.data.data.timelines[2].intervals[0].values.temperatureMin
 				// response.data.data.timelines[1].intervals[0].values.temperatureMin
-				response.data.data.timelines[0].intervals[0].values.temperatureMin
+				response.data.data.timelines[dayIndex].intervals[0].values
+					.temperatureMin
 			);
 
 			switch (currentWeatherCode) {
