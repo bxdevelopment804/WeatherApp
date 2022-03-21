@@ -180,6 +180,7 @@ const Weather = () => {
 
 	function afterOpenAddCityModal() {
 		// UNUSED
+		// document.getElementById("myText").focus();
 		setEnteredAddress(suggestedLocation[0]);
 	}
 
@@ -446,10 +447,15 @@ const Weather = () => {
 		console.log('x2x.) GET ALL WEATHER, INITIAL AND ADDED');
 
 		try {
+			// const response = await axios.get(
+			// 	'https://api.tomorrow.io/v4/timelines?location=' +
+			// 		address +
+			// 		'&fields=temperature&fields=weatherCode&fields=temperatureMin&fields=temperatureMax&fields=humidity&fields=precipitationProbability&fields=windSpeed&units=imperial&timesteps=current&timesteps=1h&timesteps=1d&timezone=US%2FEastern&apikey=4OVgMKSU755IMMZgINuqH2guWzh5MHiG'
+			// );
 			const response = await axios.get(
 				'https://api.tomorrow.io/v4/timelines?location=' +
 					address +
-					'&fields=temperature&fields=weatherCode&fields=temperatureMin&fields=temperatureMax&fields=humidity&fields=precipitationProbability&fields=windSpeed&units=imperial&timesteps=current&timesteps=1h&timesteps=1d&timezone=US%2FEastern&apikey=4OVgMKSU755IMMZgINuqH2guWzh5MHiG'
+					'&fields=temperature&fields=weatherCode&fields=temperatureMin&fields=temperatureMax&fields=humidity&fields=precipitationProbability&fields=windSpeed&units=imperial&timesteps=current&timesteps=1d&timezone=US%2FEastern&apikey=4OVgMKSU755IMMZgINuqH2guWzh5MHiG'
 			);
 			console.log('Get Initial Weather Response:');
 			console.log(response);
@@ -458,41 +464,49 @@ const Weather = () => {
 			var weatherImage;
 			// Getting UTC time zone from API response, then adding five hours to adjust that to Eastern Standard Time.
 			var estHour =
-				// Number(response.data.data.timelines[0].startTime.substring(11, 13)) + 5;
-				Number(response.data.data.timelines[2].startTime.substring(11, 13)) + 5;
+				Number(response.data.data.timelines[1].startTime.substring(11, 13)) + 5;
+			// Number(response.data.data.timelines[2].startTime.substring(11, 13)) + 5;
 			// var currentMinutes = response.data.data.timelines[0].startTime.substring(
-			var currentMinutes = response.data.data.timelines[2].startTime.substring(
-				14,
-				16
-			);
+			// var currentMinutes = response.data.data.timelines[2].startTime.substring(
+			// 	14,
+			// 	16
+			// );
+			console.log('EST Hour: ' + estHour);
+			var currentMinutes = new Date().getMinutes().toLocaleString('en-US', {
+				minimumIntegerDigits: 2,
+				useGrouping: false,
+			});
+			console.log('Current Minutes: ' + currentMinutes);
 
 			var currentTemperature = Math.round(
-				// response.data.data.timelines[0].intervals[0].values.temperature
-				response.data.data.timelines[2].intervals[0].values.temperature
+				response.data.data.timelines[1].intervals[0].values.temperature
+				// response.data.data.timelines[2].intervals[0].values.temperature
 			);
 			var currentWeatherCode =
-				// response.data.data.timelines[0].intervals[0].values.weatherCode;
-				response.data.data.timelines[2].intervals[0].values.weatherCode;
+				response.data.data.timelines[1].intervals[0].values.weatherCode;
+			// response.data.data.timelines[2].intervals[0].values.weatherCode;
 			var currentHumidity = Math.round(
-				// response.data.data.timelines[0].intervals[0].values.humidity
-				response.data.data.timelines[2].intervals[0].values.humidity
+				response.data.data.timelines[1].intervals[0].values.humidity
+				// response.data.data.timelines[2].intervals[0].values.humidity
 			);
 			var currentPrecipitationProbability = Math.round(
-				// response.data.data.timelines[0].intervals[0].values
-				response.data.data.timelines[2].intervals[0].values
+				// response.data.data.timelines[2].intervals[0].values
+				response.data.data.timelines[1].intervals[0].values
 					.precipitationProbability
 			);
 			var currentWindSpeed = Math.round(
-				// response.data.data.timelines[0].intervals[0].values.windSpeed
-				response.data.data.timelines[2].intervals[0].values.windSpeed
+				response.data.data.timelines[1].intervals[0].values.windSpeed
+				// response.data.data.timelines[2].intervals[0].values.windSpeed
 			);
 			var highTemp = Math.round(
 				// response.data.data.timelines[2].intervals[0].values.temperatureMax
-				response.data.data.timelines[1].intervals[0].values.temperatureMax
+				// response.data.data.timelines[1].intervals[0].values.temperatureMax
+				response.data.data.timelines[0].intervals[0].values.temperatureMax
 			);
 			var lowTemp = Math.round(
 				// response.data.data.timelines[2].intervals[0].values.temperatureMin
-				response.data.data.timelines[1].intervals[0].values.temperatureMin
+				// response.data.data.timelines[1].intervals[0].values.temperatureMin
+				response.data.data.timelines[0].intervals[0].values.temperatureMin
 			);
 
 			switch (currentWeatherCode) {
@@ -760,12 +774,20 @@ const Weather = () => {
 			console.log(response);
 			var apiESTAdjustment = response.data.rawOffset / 60 / 60;
 			var localHour = Number(estHour) + Number(apiESTAdjustment);
+			console.log('Local Hour: ' + localHour);
+			console.log('apiESTAdjustment: ' + apiESTAdjustment);
+
 			if (initialValues) {
 				// Update Time Zones When Going Through Local Storage Locations...
-				if (localHour <= 12 && localHour > 0) {
+				if (localHour < 12 && localHour > 0) {
 					console.log(
-						'Local Time: ' + localHour + ':' + currentMinutes + ' AM'
+						'Local Time, Location #1: ' +
+							localHour +
+							':' +
+							currentMinutes +
+							' AM'
 					);
+
 					initialWeatherObject[i].localTime =
 						localHour + ':' + currentMinutes + ' AM';
 					setLocalTime(localHour + ':' + currentMinutes + ' AM');
@@ -773,16 +795,36 @@ const Weather = () => {
 				} else if (localHour === 0) {
 					localHour = 12;
 					console.log(
-						'Local Time: ' + localHour + ':' + currentMinutes + ' AM'
+						'Local Time, Location #2: ' +
+							localHour +
+							':' +
+							currentMinutes +
+							' AM'
 					);
 					initialWeatherObject[i].localTime =
 						localHour + ':' + currentMinutes + ' AM';
 					setLocalTime(localHour + ':' + currentMinutes + ' AM');
+				} else if (localHour == 12) {
+					localHour = 12;
+					console.log(
+						'Local Time, Location #2: ' +
+							localHour +
+							':' +
+							currentMinutes +
+							' PM'
+					);
+					initialWeatherObject[i].localTime =
+						localHour + ':' + currentMinutes + ' PM';
+					setLocalTime(localHour + ':' + currentMinutes + ' PM');
 				} else {
 					// Update Time Zones For Any Added Location
 					localHour = localHour - 12;
 					console.log(
-						'Local Time: ' + localHour + ':' + currentMinutes + ' PM'
+						'Local Time, Location #3: ' +
+							localHour +
+							':' +
+							currentMinutes +
+							' PM'
 					);
 					initialWeatherObject[i].localTime =
 						localHour + ':' + currentMinutes + ' PM';

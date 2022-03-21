@@ -68,11 +68,13 @@ function SearchLocationInput() {
 			`https://maps.googleapis.com/maps/api/js?key=AIzaSyCdLuhh7iqVVQOoB0gtTPxIOFDAY6jqP0Q&libraries=places`,
 			() => handleScriptLoad(setQuery, autoCompleteRef, suggestedLocation)
 		);
+		document.getElementById('searchField').focus();
 	}, []);
 
 	return (
 		<div className='search-location-input'>
 			<input
+				id='searchField'
 				ref={autoCompleteRef}
 				onChange={(event) => setQuery(event.target.value)}
 				placeholder='Enter a City'
