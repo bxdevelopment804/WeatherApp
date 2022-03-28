@@ -37,23 +37,10 @@ function handleScriptLoad(updateQuery, autoCompleteRef, suggestedLocation) {
 async function handlePlaceSelect(updateQuery, suggestedLocation) {
 	const addressObject = autoComplete.getPlace();
 	const query = addressObject.formatted_address;
+	//If statement added to prevent an error in console about query being undefined.
 	if (query) {
-		//If statement added to prevent an error in console about query being undefined.
-		let modifiedQueryArray = query.split(',');
-		let modifiedQuery = modifiedQueryArray[0].concat(
-			' ',
-			modifiedQueryArray[1].replace(/\d+/, ' ').trim()
-		);
-		let test1 = modifiedQueryArray[1].replace(/\d+/, ' ').trim();
-
 		updateQuery(query);
-		console.log(addressObject);
-		// locationsContext[1](query);
 		suggestedLocation[1](query);
-		console.log('Query: ' + query);
-		console.log('Modified Query: ' + modifiedQuery);
-		console.log('Test1 : ' + test1);
-		console.log('Suggested Location: ' + suggestedLocation[0]);
 	}
 }
 
@@ -65,7 +52,9 @@ function SearchLocationInput() {
 
 	useEffect(() => {
 		loadScript(
-			`https://maps.googleapis.com/maps/api/js?key=AIzaSyCdLuhh7iqVVQOoB0gtTPxIOFDAY6jqP0Q&libraries=places`,
+			`${process.env.GATSBY_GOOGLE_PLACES_URL_PART_1}` +
+				`${process.env.GATSBY_GOOGLE_PLACES_API_KEY}` +
+				`${process.env.GATSBY_GOOGLE_PLACES_URL_PART_2}`,
 			() => handleScriptLoad(setQuery, autoCompleteRef, suggestedLocation)
 		);
 		document.getElementById('searchField').focus();
@@ -79,7 +68,6 @@ function SearchLocationInput() {
 				onChange={(event) => setQuery(event.target.value)}
 				placeholder='Enter a City'
 				value={query}
-				// onKeyPress='return event.keyCode != 13;'
 				onKeyPress={(e) => {
 					e.target.keyCode === 13 && e.preventDefault();
 				}}

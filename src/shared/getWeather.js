@@ -18,59 +18,37 @@ const GetWeather = (props) => {
 
 	Modal.setAppElement(`#___gatsby`);
 
-	let subtitle;
-
 	function openDeleteCityModal() {
 		setDeleteCityModalIsOpen(true);
 	}
 
 	function afterOpenDeleteCityModal() {
-		// subtitle.style.color = '#f00';
-		//Look into the above line...
+		//UNUSED
 	}
 
 	function closeDeleteCityModal() {
-		console.log('DELETE CITY MODAL - GET WEATHER.JS');
-		console.log('props.index: ' + props.index);
-
 		let lsLocationArray = JSON.parse(
 			window.localStorage.getItem('lsLocationArray')
 		);
 		if (lsLocationArray) {
-			console.log('lsLocationArray length: ' + lsLocationArray.length);
-			let objectString = JSON.stringify(lsLocationArray, null, 4);
-			console.log('lsLocationArray String Below:');
-			console.log(objectString);
-
 			let tempLocationArray = lsLocationArray;
 			tempLocationArray.splice(props.index, 1);
-			// let objectString2 = JSON.stringify(tempLocationArray, null, 4);
-			// console.log('tempLocation Array String Below:');
-			// console.log(objectString2);
+
 			if (lsLocationArray.length == 0) {
-				// window.localStorage.clear();
 				tempLocationArray = ['empty'];
-				console.log('Trying to set array to "empty"...');
+				//Temporarily setting empty local storage to 'empty'.  Otherwise it'll be set to [], which returns 'undefined' to the rest of the code.  This spits out a clothes manufacturer in Argentina named UNDEFINED.
 				window.localStorage.setItem(
 					'lsLocationArray',
 					JSON.stringify(tempLocationArray)
 				);
-				let objectString2 = JSON.stringify(tempLocationArray, null, 4);
-				console.log('tempLocation Array String Below:');
-				console.log(objectString2);
-				// document.getElementById('weatherContainer').style.display = 'none';
 			} else {
 				window.localStorage.setItem(
 					'lsLocationArray',
 					JSON.stringify(tempLocationArray)
 				);
 			}
-			// setDeleted(true);
 		}
-		// else {
-		// 	document.getElementById('weatherContainer').style.display = 'none';
-		// 	// document.getElementById('deleteModalButton').style.display = 'none';
-		// }
+
 		setDeleted(true);
 		setDeleteCityModalIsOpen(false);
 	}
@@ -78,16 +56,15 @@ const GetWeather = (props) => {
 	function cancelDeleteCityModal() {
 		setDeleteCityModalIsOpen(false);
 	}
-	// var location = props.location;
+
 	return (
 		<div>
+			{/* The below line hides the deleted container, as deleting a location from Location Array doesn't immediately trigger a re-render. */}
 			{deleted ? null : (
 				<section id='weatherContainer'>
-					{/* <section id='weatherContainer' key={props.index}> */}
-					{/* <div className='weatherLineItem'>Weather Container</div> */}
-					<div id='deleteButton' onClick={openDeleteCityModal}>
+					<button id='deleteButton' onClick={openDeleteCityModal}>
 						X
-					</div>
+					</button>
 					<div id='locationTitle' className='weatherLineItem'>
 						{props.location}
 					</div>
@@ -110,11 +87,7 @@ const GetWeather = (props) => {
 						Wind Speed: {props.currentWindSpeed} MPH
 					</div>
 					<div className='weatherLineItem'>Local Time: {props.localTime}</div>
-					{/* <div className='weatherLineItem'>Index: {props.index}</div> */}
-					{/* <div className='weatherLineItem'>
-				Weather Image Text: {props.weatherImage}
-			</div> */}
-					{/* <img src={require({props.weatherImage}).default} alt='weather text'/> */}
+
 					<img id='weatherSVG' src={props.weatherImage} alt='weather text' />
 					<Modal
 						id='deleteCityModal'
@@ -124,12 +97,7 @@ const GetWeather = (props) => {
 						style={customStyles}
 						contentLabel='Delete City Modal'
 					>
-						<h2
-							id='deleteModalHeader'
-							ref={(_subtitle) => (subtitle = _subtitle)}
-						>
-							Confirm delete?
-						</h2>
+						<h2 id='deleteModalHeader'>Confirm delete?</h2>
 						<div id='deleteModalButtonContainer'>
 							<button
 								className='deleteModalButton'
@@ -146,7 +114,6 @@ const GetWeather = (props) => {
 								Cancel
 							</button>
 						</div>
-						{/* </Link> */}
 					</Modal>
 				</section>
 			)}
