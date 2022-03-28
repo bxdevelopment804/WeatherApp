@@ -175,7 +175,7 @@ const Weather = () => {
 				alert(`Please enter a valid location.`);
 			}
 		} catch (error) {
-			console.error(error);
+			// console.error(error);
 		}
 	}
 
@@ -369,25 +369,11 @@ const Weather = () => {
 				weatherObject.highTemp = highTemp;
 				weatherObject.lowTemp = lowTemp;
 
-				console.log(
-					'Weather Object: Location ' +
-						weatherObject.location +
-						' Temperature ' +
-						weatherObject.temperature +
-						' CurrentConditions' +
-						weatherObject.currentConditions +
-						' Key ' +
-						weatherObject.key +
-						' Local Time ' +
-						weatherObject.localTime +
-						'Weather Image' +
-						weatherObject.weatherImage
-				);
 				let initialValues3 = false;
 				getAllCityTimeZones(address, estHour, currentMinutes, initialValues3);
 			}
 		} catch (error) {
-			console.error(error);
+			// console.error(error);
 			alert(
 				'Unfortunately, this Tomorrow.io account will only allow for 25 API calls per hour.  Additional weather updates will be available at the start of the next hour.'
 			);
@@ -473,12 +459,12 @@ const Weather = () => {
 					setAddressArray([...updatedAddressArray2]);
 
 					if (!window.localStorage.getItem('lsLocationArray')) {
-						console.log('No Previous Locations Found In Local Storage');
+						// console.log('No Previous Locations Found In Local Storage');
 					}
 				}
 			}
 		} catch (error) {
-			console.error(error);
+			// console.error(error);
 		}
 	}
 
@@ -523,7 +509,7 @@ const Weather = () => {
 
 						setLocationArray(tempLocationArray);
 
-						console.log('No Previous Locations Found In Local Storage');
+						// console.log('No Previous Locations Found In Local Storage');
 						let initialLSLocationArray = [];
 
 						initialLSLocationArray.push(modifiedCityAndState);
