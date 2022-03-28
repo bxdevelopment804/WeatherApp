@@ -11,26 +11,11 @@ export default function HTML(props) {
 					name='viewport'
 					content='width=device-width, initial-scale=1, shrink-to-fit=no'
 				/>
-				<title>Weather Widget</title>
-				{/* <script
-					dangerouslySetInnerHTML={{
-						__html: `
-              type='text/javascript'
-              src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCdLuhh7iqVVQOoB0gtTPxIOFDAY6jqP0Q&language=en&libraries=places'
-          `,
-					}}
-				></script> */}
+				<title>Weather</title>
+
 				{props.headComponents}
 			</head>
 			<body {...props.bodyAttributes}>
-				{/* <script
-					dangerouslySetInnerHTML={{
-						__html: `
-              type='text/javascript'
-              src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCdLuhh7iqVVQOoB0gtTPxIOFDAY6jqP0Q&language=en&libraries=places'
-          `,
-					}}
-				></script> */}
 				{props.preBodyComponents}
 				<div
 					key={`body`}

@@ -35,7 +35,6 @@ const Weather = () => {
 	//Overall, Weather function looks in local storage for any locations a user previously added, which are stored in an array.  (A default location will be used if this is the user's first time on this page.)  The location array is converted into an array of weather objects for each city, and which is then passed to the GetWeather component for rendering.  New locations the user adds will be added to local storage.
 	//   Each location is passed to the Google Geocode API for conversion to latitude and longitude, as required by the Tomorrow.io API.  The coordinates are then passed to the Tomorrow.io API for various weather information, and then passed to the Google Maps API to help determine the local time for each location.  All API calls handled through Axios.
 	const [enteredAddress, setEnteredAddress] = useState('');
-	// const [formattedLatLng, setFormattedLatLng] = useState();
 	const [addressArray, setAddressArray] = useState([]);
 	const [locationArray, setLocationArray] = useState(['Sacramento, CA']);
 	const [addCityModalIsOpen, setAddCityModalIsOpen] = useState(false);
@@ -69,32 +68,28 @@ const Weather = () => {
 
 	Modal.setAppElement(`#___gatsby`);
 
+	//Opens modal to add a city.
 	function openAddCityModal() {
 		setAddCityModalIsOpen(true);
 		suggestedLocation[1]('');
+		//If the user starts to add a city after just adding a new one, but clicks out of the modal, the above line prevents the first city from being added again.
 	}
 
 	function afterOpenAddCityModal() {
-		// setEnteredAddress(suggestedLocation[0]);
+		//UNUSED
 	}
 
+	//Gets desired location from user and submits to API chain for weather info.
 	function closeAddCityModal() {
 		if (suggestedLocation[0] && suggestedLocation[0] !== '') {
-			// alert(`Close modal function triggered.`);
-			console.log('Close modal suggested location: ' + suggestedLocation[0]);
-			// console.log(
-			// 	'CloseAddCityModal() suggestedLocation[0] ' + suggestedLocation[0]
-			// );
-			// setEnteredAddress(suggestedLocation[0]);
 			let passedLocation = suggestedLocation[0];
 			convertAddressToLatLng(passedLocation);
 		}
 		setAddCityModalIsOpen(false);
 	}
 
+	//Cancels adding a new location.
 	function cancelAddCityModal() {
-		// alert(`Cancel modal function triggered.`);
-
 		if (enteredAddress) {
 			setEnteredAddress('');
 		}
@@ -114,10 +109,8 @@ const Weather = () => {
 	var processArray;
 
 	// -------------------------
-	// useEffect renders weather date for any locations in local storage on page load
+	// useEffect gets any locations previously added by the user from local storage on page load, and sends them through the API chain for weather updates.
 	useEffect(() => {
-		// console.log('0.) USE EFFECT');
-
 		if (window !== 'undefined') {
 			let lsLocationArray = JSON.parse(
 				window.localStorage.getItem('lsLocationArray')
@@ -125,26 +118,15 @@ const Weather = () => {
 
 			if (lsLocationArray && lsLocationArray[0] != 'empty') {
 				//If previous locations are found in local storage, create a new 'process array' with those locations.  If no previous locations are found, use the LocationArray state location.
-				// console.log('Local storage found.');
 				setLocationArray(lsLocationArray);
 				processArray = lsLocationArray;
-				// let objectString = JSON.stringify(locationArray, null, 4);
-				// console.log('LocationArray String Below:');
-				// console.log(objectString);
-				// let objectString2 = JSON.stringify(processArray, null, 4);
-				// console.log('Process Array String Below:');
-				// console.log(objectString2);
 			} else {
 				//No previous locations were found, so use the LocationArray default state location.
 				processArray = locationArray;
-				// let objectString3 = JSON.stringify(processArray, null, 4);
-				// console.log('Process Array String Below:');
-				// console.log(objectString3);
 				window.localStorage.clear();
 			}
 		}
 		processArray.forEach((location, i) => {
-			// console.log('Process Array ' + i + ': ' + processArray[i]);
 			initialWeatherObject.push({
 				key: '',
 				location: '',
@@ -158,17 +140,14 @@ const Weather = () => {
 				highTemp: '',
 				lowTemp: '',
 			});
-			// console.log('UseEffect Location: ' + location);
-			// console.log('useEffect i: ' + i);
 
 			convertInitialAddressesToLatLng(location, i);
 		});
 	}, []);
 
 	// ----------------------------------------------------------
-	//Functions for processing the initial saved locations.
+	//Gets latitude and longitude for locations already saved in local storage.  Tomorrow.io API needs lat/lng to get weather information.
 	async function convertInitialAddressesToLatLng(providedAddress, i) {
-		// console.log('1.) CONVERT ADDRESS TO LAT/LNG');
 		var lat = '';
 		var lng = '';
 		var cityAndState = '';
@@ -186,24 +165,10 @@ const Weather = () => {
 				lat = response.data.results[0].geometry.location.lat;
 				lng = response.data.results[0].geometry.location.lng;
 				cityAndState = response.data.results[0].formatted_address;
-
-				//--------------------
 				initialWeatherObject[i].location = cityAndState;
-				// console.log(
-				// 	'Updating Weather Object Location ' + i + ' With: ' + cityAndState
-				// );
-				// console.log(
-				// 	'Initial Weather Object Location' +
-				// 		i +
-				// 		': ' +
-				// 		initialWeatherObject[i].location
-				// );
 
 				//Adding below line because async state update isn't fast enough to immediately pass to getWeather()
 				var address = lat + ',' + lng;
-				// console.log('Initial Response:');
-				// console.log(response);
-				// console.log('Initial City/State: ' + cityAndState);
 				let initialValues = true;
 				getAllWeather(address, i, initialValues);
 			} else {
@@ -214,9 +179,8 @@ const Weather = () => {
 		}
 	}
 
+	//Gets weather information for both initial locations in local storage as well as any locations added from the Add Location modal.
 	async function getAllWeather(address, i, initialValues) {
-		// console.log('x2x.) GET ALL WEATHER, INITIAL AND ADDED');
-
 		try {
 			const response = await axios.get(
 				`${process.env.GATSBY_TOMORROW_IO_URL_PART_1}` +
@@ -224,8 +188,6 @@ const Weather = () => {
 					`${process.env.GATSBY_TOMORROW_IO_URL_PART_2}` +
 					`${process.env.GATSBY_TOMORROW_IO_API_KEY}`
 			);
-			// console.log('Get Initial Weather Response:');
-			// console.log(response);
 
 			var currentConditions;
 			var weatherImage;
@@ -234,9 +196,6 @@ const Weather = () => {
 				minimumIntegerDigits: 2,
 				useGrouping: false,
 			});
-			// console.log('Current Minutes: ' + currentMinutes);
-
-			// console.log('Data Array Length: ' + response.data.data.timelines.length);
 			var currentIndex;
 			var dayIndex;
 			for (let i = 0; i < response.data.data.timelines.length; ++i) {
@@ -246,13 +205,11 @@ const Weather = () => {
 					dayIndex = i;
 				}
 			}
-			// console.log('currentIndex: ' + currentIndex + ' dayIndex: ' + dayIndex);
 
 			var estHour =
 				Number(
 					response.data.data.timelines[currentIndex].startTime.substring(11, 13)
 				) + 5;
-			// console.log('EST Hour: ' + estHour);
 
 			var currentTemperature = Math.round(
 				response.data.data.timelines[currentIndex].intervals[0].values
@@ -391,58 +348,6 @@ const Weather = () => {
 				initialWeatherObject[i].highTemp = highTemp;
 				initialWeatherObject[i].lowTemp = lowTemp;
 
-				// console.log(
-				// 	'Initial Weather Object Location ' +
-				// 		i +
-				// 		': ' +
-				// 		initialWeatherObject[i].location
-				// );
-				// console.log(
-				// 	'Updating Weather Object ' + i + ' Temp With: ' + currentTemperature
-				// );
-				// console.log(
-				// 	'Initial Weather Object Temperature ' +
-				// 		i +
-				// 		': ' +
-				// 		initialWeatherObject[i].temperature
-				// );
-				// console.log(
-				// 	'Updating Weather Object ' +
-				// 		i +
-				// 		' Conditions With: ' +
-				// 		currentConditions
-				// );
-				// console.log(
-				// 	'Initial Weather Object Conditions ' +
-				// 		i +
-				// 		': ' +
-				// 		initialWeatherObject[i].currentConditions
-				// );
-				// console.log('Updating Weather Object ' + i + ' Key With: ' + i);
-				// console.log(
-				// 	'Initial Weather Object Key ' + i + ': ' + initialWeatherObject[i].key
-				// );
-
-				// console.log(
-				// 	'Initial Weather Object: Location ' +
-				// 		initialWeatherObject[i].location +
-				// 		' Temperature ' +
-				// 		initialWeatherObject[i].temperature +
-				// 		' Current Conditions ' +
-				// 		initialWeatherObject[i].currentConditions +
-				// 		' Key ' +
-				// 		initialWeatherObject[i].key +
-				// 		' Current Humidity ' +
-				// 		initialWeatherObject[i].currentHumidity +
-				// 		' Current Precipitation Chance ' +
-				// 		initialWeatherObject[i].currentPrecipitationProbability +
-				// 		' Current Wind Speed ' +
-				// 		initialWeatherObject[i].currentWindSpeed +
-				// 		' High Temp ' +
-				// 		initialWeatherObject[i].highTemp +
-				// 		'Low Temp ' +
-				// 		initialWeatherObject[i].lowTemp
-				// );
 				let initialValues2 = true;
 				getAllCityTimeZones(
 					address,
@@ -464,23 +369,20 @@ const Weather = () => {
 				weatherObject.highTemp = highTemp;
 				weatherObject.lowTemp = lowTemp;
 
-				// console.log(
-				// 	'Weather Object: Location ' +
-				// 		weatherObject.location +
-				// 		' Temperature ' +
-				// 		weatherObject.temperature +
-				// 		' CurrentConditions' +
-				// 		weatherObject.currentConditions +
-				// 		' Key ' +
-				// 		weatherObject.key +
-				// 		' Local Time ' +
-				// 		weatherObject.localTime +
-				// 		'Weather Image' +
-				// 		weatherObject.weatherImage
-				// );
-				// let objectString = JSON.stringify(locationArray, null, 4);
-				// console.log('Location Array String Below:');
-				// console.log(objectString);
+				console.log(
+					'Weather Object: Location ' +
+						weatherObject.location +
+						' Temperature ' +
+						weatherObject.temperature +
+						' CurrentConditions' +
+						weatherObject.currentConditions +
+						' Key ' +
+						weatherObject.key +
+						' Local Time ' +
+						weatherObject.localTime +
+						'Weather Image' +
+						weatherObject.weatherImage
+				);
 				let initialValues3 = false;
 				getAllCityTimeZones(address, estHour, currentMinutes, initialValues3);
 			}
@@ -490,9 +392,6 @@ const Weather = () => {
 				'Unfortunately, this Tomorrow.io account will only allow for 25 API calls per hour.  Additional weather updates will be available at the start of the next hour.'
 			);
 		}
-		// console.log(
-		// 	'Formatted Lat/Lng: (Will not populate fast enough.)' + formattedLatLng
-		// );
 	}
 
 	async function getAllCityTimeZones(
@@ -502,9 +401,6 @@ const Weather = () => {
 		i,
 		initialValues
 	) {
-		// console.log('x3x.) GET ALL TIME ZONES, INITIAL & ADDITIONS');
-		// console.log('Current i value: ' + i);
-		// console.log('Initial Values: ' + initialValues);
 		const dateNow = Date.now() / 1000;
 		try {
 			const response = await axios.get(
@@ -515,56 +411,25 @@ const Weather = () => {
 					`${process.env.GATSBY_GOOGLE_TIMEZONE_URL_PART_3}` +
 					`${process.env.GATSBY_GOOGLE_TIMEZONE_API_KEY}`
 			);
-			// console.log(response);
 			var apiESTAdjustment = response.data.rawOffset / 60 / 60;
 			var localHour = Number(estHour) + Number(apiESTAdjustment);
-			// console.log('Local Hour: ' + localHour);
-			// console.log('apiESTAdjustment: ' + apiESTAdjustment);
 
 			if (initialValues) {
 				// Update Time Zones When Going Through Local Storage Locations...
 				if (localHour < 12 && localHour > 0) {
-					// console.log(
-					// 	'Local Time, Location #1: ' +
-					// 		localHour +
-					// 		':' +
-					// 		currentMinutes +
-					// 		' AM'
-					// );
 					initialWeatherObject[i].localTime =
 						localHour + ':' + currentMinutes + ' AM';
 				} else if (localHour === 0) {
 					localHour = 12;
-					// console.log(
-					// 	'Local Time, Location #2: ' +
-					// 		localHour +
-					// 		':' +
-					// 		currentMinutes +
-					// 		' AM'
-					// );
 					initialWeatherObject[i].localTime =
 						localHour + ':' + currentMinutes + ' AM';
 				} else if (localHour == 12) {
 					localHour = 12;
-					// console.log(
-					// 	'Local Time, Location #2: ' +
-					// 		localHour +
-					// 		':' +
-					// 		currentMinutes +
-					// 		' PM'
-					// );
 					initialWeatherObject[i].localTime =
 						localHour + ':' + currentMinutes + ' PM';
 				} else {
 					// Update Time Zones For Any Added Locations
 					localHour = localHour - 12;
-					// console.log(
-					// 	'Local Time, Location #3: ' +
-					// 		localHour +
-					// 		':' +
-					// 		currentMinutes +
-					// 		' PM'
-					// );
 					initialWeatherObject[i].localTime =
 						localHour + ':' + currentMinutes + ' PM';
 				}
@@ -574,21 +439,6 @@ const Weather = () => {
 						Math.floor(Math.random() * backgroundsArray.length)
 					);
 				}
-				// for (let n = 0; n < initialWeatherObject.length; ++n) {
-				// 	console.log(
-				// 		'Initial Weather Object Length: ' + initialWeatherObject.length
-				// 	);
-				// 	console.log('Current Initial Weather Object Contents Listed Below: ');
-				// 	console.log('	Location ' + n + ' ' + initialWeatherObject[n].location);
-				// 	console.log(
-				// 		'	Temperature ' + n + ' ' + initialWeatherObject[n].temperature
-				// 	);
-				// 	console.log('	Key ' + n + ' ' + initialWeatherObject[n].key);
-				// 	console.log(' Local Time ' + n + initialWeatherObject[n].localTime);
-				// }
-				// let objectString = JSON.stringify(addressArray, null, 4);
-				// console.log('Address Array Object String Below:');
-				// console.log(objectString);
 			} else if (!initialValues) {
 				let tempBackgroundNumber = Math.floor(
 					Math.random() * backgroundsArray.length
@@ -600,30 +450,18 @@ const Weather = () => {
 				}
 				setRandomBackground(tempBackgroundNumber);
 				if (localHour <= 12 && localHour > 0) {
-					// console.log(
-					// 	'Local Time: ' + localHour + ':' + currentMinutes + ' AM'
-					// );
 					weatherObject.localTime = localHour + ':' + currentMinutes + ' AM';
 				} else if (localHour === 0) {
 					localHour = 12;
-					// console.log(
-					// 	'Local Time: ' + localHour + ':' + currentMinutes + ' AM'
-					// );
 					weatherObject.localTime = localHour + ':' + currentMinutes + ' AM';
 				} else {
 					localHour = localHour - 12;
-					// console.log(
-					// 	'Local Time: ' + localHour + ':' + currentMinutes + ' PM'
-					// );
 					weatherObject.localTime = localHour + ':' + currentMinutes + ' PM';
 				}
 				if (window !== 'undefined') {
 					let currentLSLocationArray = JSON.parse(
 						window.localStorage.getItem('lsLocationArray')
 					);
-					// console.log(
-					// 	'currentLSLocationArray.length: ' + currentLSLocationArray.length
-					// );
 					var updatedAddressArray2;
 					if (currentLSLocationArray.length == 1) {
 						updatedAddressArray2 = [];
@@ -632,16 +470,7 @@ const Weather = () => {
 						updatedAddressArray2 = addressArray;
 					}
 					updatedAddressArray2.push(weatherObject);
-					// console.log('Pushing to updatedAddressArray2 to Address Array!');
 					setAddressArray([...updatedAddressArray2]);
-
-					// let objectString3 = JSON.stringify(updatedAddressArray2, null, 4);
-					// console.log('updatedAddressArray2 String Below:');
-					// console.log(objectString3);
-
-					// let objectString4 = JSON.stringify(weatherObject, null, 4);
-					// console.log('weatherObject String Below:');
-					// console.log(objectString4);
 
 					if (!window.localStorage.getItem('lsLocationArray')) {
 						console.log('No Previous Locations Found In Local Storage');
@@ -653,17 +482,11 @@ const Weather = () => {
 		}
 	}
 
-	// -----------------------
-	// CODE BREAK!! - Functions for processing added locations the user adds.
-	// -----------------------
-
-	// Converts a zip code or city & state into a latitude & longitude.
+	// Takes an additional location from the Add City modal and converts it into a latitude & longitude.  The coordinates are then sent to the fun
 	async function convertAddressToLatLng(passedLocation) {
-		// console.log('4.) CONVERT ADDED ADDRESS TO LAT & LNG');
 		var lat = '';
 		var lng = '';
 		var cityAndState = '';
-		// console.log('passedLocation: ' + passedLocation);
 		var formattedAddress;
 		if (passedLocation) {
 			formattedAddress = passedLocation.trim().replace(' ', ',+');
@@ -691,9 +514,6 @@ const Weather = () => {
 
 				weatherObject.location = modifiedCityAndState;
 
-				// setFormattedLatLng(lat + ',' + lng);
-
-				// console.log('Modified City and State: ' + modifiedCityAndState);
 				if (window !== 'undefined') {
 					if (!window.localStorage.getItem('lsLocationArray')) {
 						setAddressArray([]);
@@ -701,17 +521,12 @@ const Weather = () => {
 
 						tempLocationArray.push(modifiedCityAndState);
 
-						// console.log('Setting Location Array to ' + modifiedCityAndState);
-						// let objectString1 = JSON.stringify(tempLocationArray, null, 4);
-						// console.log('tempLocationArray String Below (NOT Local Storage):');
-						// console.log(objectString1);
 						setLocationArray(tempLocationArray);
 
 						console.log('No Previous Locations Found In Local Storage');
 						let initialLSLocationArray = [];
 
 						initialLSLocationArray.push(modifiedCityAndState);
-						// console.log('Adding: ' + initialLSLocationArray);
 						window.localStorage.setItem(
 							'lsLocationArray',
 							JSON.stringify(initialLSLocationArray)
@@ -722,20 +537,11 @@ const Weather = () => {
 						tempLocationArray.push(modifiedCityAndState);
 						setLocationArray(tempLocationArray);
 
-						// console.log('Local Storage Variables Found.');
 						let tempLSLocationArray = JSON.parse(
 							window.localStorage.getItem('lsLocationArray')
 						);
-						// console.log('Temp LS Location Array: ' + tempLSLocationArray);
-						// let objectString5 = JSON.stringify(tempLSLocationArray, null, 4);
-						// console.log('Initial tempLSLocationArray String Below:');
-						// console.log(objectString5);
 
 						tempLSLocationArray.push(modifiedCityAndState);
-						// console.log('Saving Back to Local Storage:');
-						// let objectString2 = JSON.stringify(tempLSLocationArray, null, 4);
-
-						// console.log(objectString2);
 						window.localStorage.setItem(
 							'lsLocationArray',
 							JSON.stringify(tempLSLocationArray)
@@ -745,11 +551,6 @@ const Weather = () => {
 
 				//Adding below line because async state update isn't fast enough to immediately pass to getWeather()
 				var address = lat + ',' + lng;
-				// console.log(response);
-				// console.log('City/State: ' + cityAndState);
-				// let objectString = JSON.stringify(locationArray, null, 4);
-				// console.log('Location Array String Below:');
-				// console.log(objectString);
 
 				let initialValues = false;
 				getAllWeather(address, initialValues);
