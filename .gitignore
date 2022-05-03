@@ -3,3 +3,5 @@ node_modules/
 public
 src\.env.development
 src\.env.production
+.env.production
+.env.development
