@@ -32,7 +32,7 @@ import tstorm from '../images/tstorm.svg';
 const axios = require('axios');
 
 const Weather = () => {
-	//Overall, Weather function looks in local storage for any locations a user previously added, which are stored in an array.  (A default location will be used if this is the user's first time on this page.)  The location array is converted into an array of weather objects for each city, and which is then passed to the GetWeather component for rendering.  New locations the user adds will be added to local storage.
+	//Overall, the Weather function looks in local storage for any locations a user previously added, which are stored in an array.  (A default location will be used if this is the user's first time on this page.)  The location array is converted into an array of weather objects for each city, and which is then passed to the GetWeather component for rendering.  New locations the user adds will be added to local storage.
 	//   Each location is passed to the Google Geocode API for conversion to latitude and longitude, as required by the Tomorrow.io API.  The coordinates are then passed to the Tomorrow.io API for various weather information, and then passed to the Google Maps API to help determine the local time for each location.  All API calls handled through Axios.
 	const [enteredAddress, setEnteredAddress] = useState('');
 	const [addressArray, setAddressArray] = useState([]);
@@ -198,11 +198,11 @@ const Weather = () => {
 			});
 			var currentIndex;
 			var dayIndex;
-			for (let i = 0; i < response.data.data.timelines.length; ++i) {
-				if (response.data.data.timelines[i].timestep == 'current') {
-					currentIndex = i;
-				} else if (response.data.data.timelines[i].timestep == '1d') {
-					dayIndex = i;
+			for (let n = 0; n < response.data.data.timelines.length; ++n) {
+				if (response.data.data.timelines[n].timestep == 'current') {
+					currentIndex = n;
+				} else if (response.data.data.timelines[n].timestep == '1d') {
+					dayIndex = n;
 				}
 			}
 
@@ -399,27 +399,34 @@ const Weather = () => {
 			);
 			var apiESTAdjustment = response.data.rawOffset / 60 / 60;
 			var localHour = Number(estHour) + Number(apiESTAdjustment);
+			console.log('Address: ', address);
+			console.log('Local Hour: ' + localHour);
 
 			if (initialValues) {
 				// Update Time Zones When Going Through Local Storage Locations...
 				if (localHour < 12 && localHour > 0) {
 					initialWeatherObject[i].localTime =
 						localHour + ':' + currentMinutes + ' AM';
+					console.log('Trigger Location 1');
 				} else if (localHour === 0) {
 					localHour = 12;
 					initialWeatherObject[i].localTime =
 						localHour + ':' + currentMinutes + ' AM';
+					console.log('Trigger Location 2');
 				} else if (localHour == 12) {
 					localHour = 12;
 					initialWeatherObject[i].localTime =
 						localHour + ':' + currentMinutes + ' PM';
+					console.log('Trigger Location 3');
 				} else {
 					// Update Time Zones For Any Added Locations
 					localHour = localHour - 12;
 					initialWeatherObject[i].localTime =
 						localHour + ':' + currentMinutes + ' PM';
+					console.log('Trigger Location 4');
 				}
 				setAddressArray(initialWeatherObject);
+				console.dir(initialWeatherObject);
 				if (i == locationArray.length - 1) {
 					setRandomBackground(
 						Math.floor(Math.random() * backgroundsArray.length)
@@ -435,15 +442,26 @@ const Weather = () => {
 					);
 				}
 				setRandomBackground(tempBackgroundNumber);
-				if (localHour <= 12 && localHour > 0) {
+				//-----------------------
+				//ERROR CHECKING THIS FIRST IF STATEMENT FOR NOON ISSUE
+				// if (localHour <= 12 && localHour > 0) {
+				if (localHour < 12 && localHour > 0) {
 					weatherObject.localTime = localHour + ':' + currentMinutes + ' AM';
+					console.log('Test Location 5');
 				} else if (localHour === 0) {
 					localHour = 12;
 					weatherObject.localTime = localHour + ':' + currentMinutes + ' AM';
+					console.log('Test Location 6');
+				} else if (localHour == 12) {
+					localHour = 12;
+					weatherObject.localTime = localHour + ':' + currentMinutes + ' PM';
+					console.log('Trigger Location 7');
 				} else {
 					localHour = localHour - 12;
 					weatherObject.localTime = localHour + ':' + currentMinutes + ' PM';
+					console.log('Test Location 8');
 				}
+				//-----------------------
 				if (window !== 'undefined') {
 					let currentLSLocationArray = JSON.parse(
 						window.localStorage.getItem('lsLocationArray')
@@ -557,7 +575,7 @@ const Weather = () => {
 				)`,
 			}}
 		>
-			<h2 id='pageTitle'>Weather Widget</h2>
+			<h2 id='pageTitle'>Weather Updates</h2>
 			<div id='weatherSlides'>
 				{addressArray.map((address, i) => {
 					return (
