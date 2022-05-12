@@ -20,7 +20,7 @@
     - Gatsby
     - Sass
     - Tomorrow.io API
-    - Google Geocoding, Time Zone, and Places APIs
+    - Google Geocoding, Places, and Time Zone APIs
     - Axios
 
 4.  **Link**
