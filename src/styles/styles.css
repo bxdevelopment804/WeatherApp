@@ -13,6 +13,7 @@
   border-radius: 5px;
   box-sizing: border-box;
   padding: 4px;
+  text-align: center;
 }
 #pageContainer #weatherSlides {
   position: relative;
@@ -49,6 +50,7 @@
   border-radius: 5px;
   padding: 4px;
   margin: 2px auto;
+  text-align: center;
 }
 #pageContainer .bottomText #tomorrowCredit {
   width: 200px;
