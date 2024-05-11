@@ -20,4 +20,4 @@
 
 4.  **Link**
 
-    - [Weather App](https://weatherappmain.gatsbyjs.io/)
+    - [Weather App](bxd-weather.vercel.app/)
