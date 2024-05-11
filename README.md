@@ -20,4 +20,4 @@
 
 4.  **Link**
 
-    - [Weather App](bxd-weather.vercel.app/)
+    - [Weather App](https://bxd-weather.vercel.app/)
